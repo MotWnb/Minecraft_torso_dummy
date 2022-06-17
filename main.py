@@ -99,4 +99,3 @@ if __name__ == '__main__':
     frame.Centre()
     frame.Show()
     app.MainLoop()
-# 新推送消息
