@@ -1,6 +1,7 @@
 import wx
 import uuid
 import socket
+import json
 
 
 class Frame(wx.Frame):
@@ -57,6 +58,10 @@ def read():
     return lines
 
 
+def dict_to_bytes(d):
+    return bytes(json.dumps(d), encoding="utf8")
+
+
 def login(username, password):
     print('正在启动...\nStarting...')
     print('正在生成UUID...\nGenerating UUID...')
@@ -82,15 +87,18 @@ def login(username, password):
     join.connect((server, port))
     print('已连接服务器:' + server)
     while True:
-        message = input('请输入消息:')
-        if message == 'exit':
-            break
-        join.send(bytes(message, 'UTF-8'))
-        print('已发送消息:' + message)
-        data = join.recv(1024)
-        print('已接收消息:' + data.decode('UTF-8'))
-    join.close()
-    print('已关闭连接')
+        Protocol_Version = {'protocol_version': 758}
+        Protocol_Version = dict_to_bytes(Protocol_Version)
+        join.send(Protocol_Version)
+        Server_Address = {'server_address': server}
+        Server_Address = dict_to_bytes(Server_Address)
+        join.send(Server_Address)
+        Server_Port = {'server_port': port}
+        Server_Port = dict_to_bytes(Server_Port)
+        join.send(Server_Port)
+        Next_State = {'next_state': 2}
+        Next_State = dict_to_bytes(Next_State)
+        join.send(Next_State)
 
 
 if __name__ == '__main__':
